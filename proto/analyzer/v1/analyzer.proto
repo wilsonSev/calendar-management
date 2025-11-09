@@ -21,3 +21,15 @@ message ParseResponse {
 service AnalyzerService {
 	rpc Parse(ParseRequest) returns (ParseResponse);
 }
+//тут мне тоже нужно добавить свои функции , нет ?
+
+
+//питониская часть
+import "google/protobuf/timestamp.proto";
+
+message Event {
+  string name = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp finish_time = 3;
+  repeated string participants = 4;
+}
