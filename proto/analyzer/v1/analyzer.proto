@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package analyzer.v1;
+// <путь_в_модуле> ; <имя_пакета>
+option go_package = "github.com/wilsonSev/calendar-management/proto/analyzer/v1;analyzerv1"
+
+// структура для передачи данных в анализатор
+message ParseRequest {
+	string text = 1; // текстовое сообщение пользователя в боте
+	string user_id = 2; // id пользователя
+	string locale = 3; // язык текста
+	string timezone = 4; // часовой пояс
+}
+
+// структура для получения ответа от анализатора для оповещения пользователя
+message ParseResponse {
+	string status = 1; // "accepted" | "error"
+}
+
+// метод для взаимодействия
+service AnalyzerService {
+	rpc Parse(ParseRequest) returns (ParseResponse);
+}
