@@ -8,6 +8,8 @@ from event import Event
 client = Perplexity()
 
 
+# text -> event
+# end_time optional
 def parse_message(message: str) -> Event:
     prompt = f"""
   Распарсь этот текст в следующий JSON формат:
