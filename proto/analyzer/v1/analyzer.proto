@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package analyzer.v1;
 // <путь_в_модуле> ; <имя_пакета>
-option go_package = "github.com/wilsonSev/calendar-management/proto/analyzer/v1;analyzerv1"
+option go_package = "github.com/wilsonSev/calendar-management/proto/analyzer/v1;analyzerv1";
 
 // структура для передачи данных в анализатор
 message ParseRequest {
