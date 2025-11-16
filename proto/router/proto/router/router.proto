@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package scheduler;
+
+option go_package = "calendar_management/routerv0; routerv0 ";
+
+service Scheduler {
+  rpc CreateEvent(CreateEventRequest) returns (CreateEventResponse);
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+}
+
+message DateRange {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message DateTimeRange {
+  string start_datetime = 1;
+  string end_datetime = 2;
+}
+
+message CreateEventRequest {
+  string title = 1;
+
+  oneof time {
+    DateRange date = 2;
+    DateTimeRange datetime = 3;
+  }
+}
+
+message CreateEventResponse {
+  bool success = 1;
+  string id = 2;
+}
+
+message CreateTaskRequest {
+  string title = 1;
+}
+
+message CreateTaskResponse {
+  bool success = 1;
+  string id = 2;
+}
