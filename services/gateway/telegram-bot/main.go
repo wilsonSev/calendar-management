@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	config := config.Config{}
+	config := config.MustLoad()
 	bot, err := bot.New(config.Token)
 	if err != nil {
 		log.Fatal("failed to create bot:", err)
