@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -13,7 +14,7 @@ type Config struct {
 func MustLoad() Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("Error loading .env file")
+		log.Printf("Error loading .env file: " + err.Error())
 	}
 	token := os.Getenv("TELEGRAM_BOT_TOKEN")
 	if token == "" {
