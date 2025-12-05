@@ -10,6 +10,7 @@ message ParseRequest {
 	string user_id = 2; // id пользователя
 	string locale = 3; // язык текста
 	string timezone = 4; // часовой пояс
+	google.protobuf.Timestamp timestamp = 5; //время отправки сообщения
 }
 
 // структура для получения ответа от анализатора для оповещения пользователя
@@ -28,7 +29,7 @@ service AnalyzerService {
 import "google/protobuf/timestamp.proto";
 
 message Event {
- string name = 1;
+ 	string name = 1;
   google.protobuf.Timestamp start_time = 2;
   google.protobuf.Timestamp finish_time = 3;
   repeated string participants = 4;
