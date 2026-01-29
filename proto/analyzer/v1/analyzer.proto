@@ -1,36 +1,38 @@
 syntax = "proto3";
 
 package analyzer.v1;
-// <путь_в_модуле> ; <имя_пакета>
 option go_package = "github.com/wilsonSev/calendar-management/proto/analyzer/v1;analyzerv1";
 
-// структура для передачи данных в анализатор
-message ParseRequest {
-	string text = 1; // текстовое сообщение пользователя в боте
-	string user_id = 2; // id пользователя
-	string locale = 3; // язык текста
-	string timezone = 4; // часовой пояс
-	google.protobuf.Timestamp timestamp = 5; //время отправки сообщения
-}
-
-// структура для получения ответа от анализатора для оповещения пользователя
-message ParseResponse {
-	string status = 1; // "accepted" | "error"
-}
-
-// метод для взаимодействия
 service AnalyzerService {
-	rpc Parse(ParseRequest) returns (ParseResponse);
+  rpc AnalyzeText(AnalyzeTextRequest) returns (AnalyzeTextResponse);
 }
-//тут мне тоже нужно добавить свои функции , нет ?
 
+message AnalyzeTextRequest {
+  int64 tg_user_id = 1;
+  string text = 2;        // raw text from user
+  string timezone = 3;    // e.g. "Europe/Zurich"
+  int64 chat_id = 4;      // optional: for correlation/logging
+}
 
-//питониская часть
-import "google/protobuf/timestamp.proto";
+message AnalyzeTextResponse {
+  oneof result {
+    CreateEvent create_event = 1;
+    NeedClarification need_clarification = 2;
+    Error error = 3;
+  }
+}
 
-message Event {
- 	string name = 1;
-  google.protobuf.Timestamp start_time = 2;
-  google.protobuf.Timestamp finish_time = 3;
-  repeated string participants = 4;
+message CreateEvent {
+  string title = 1;
+  string description = 2;
+  int64 start_unix = 3;   // unix seconds
+  int64 end_unix = 4;     // unix seconds
+}
+
+message NeedClarification {
+  string question = 1;    // what bot should ask user
+}
+
+message Error {
+  string message = 1;     // user-friendly error
 }
