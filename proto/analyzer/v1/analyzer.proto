@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package analyzer.v1;
-option go_package = "github.com/wilsonSev/calendar-management/proto/analyzer/v1;analyzerv1";
+option go_package = "github.com/andrepribavkin/calendar-management/proto/analyzer/v1;analyzerv1";
 
 service AnalyzerService {
   rpc AnalyzeText(AnalyzeTextRequest) returns (AnalyzeTextResponse);
@@ -22,11 +22,13 @@ message AnalyzeTextResponse {
   }
 }
 
+import "google/protobuf/timestamp.proto";
+
 message CreateEvent {
   string title = 1;
   string description = 2;
-  int64 start_unix = 3;   // unix seconds
-  int64 end_unix = 4;     // unix seconds
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
 }
 
 message NeedClarification {

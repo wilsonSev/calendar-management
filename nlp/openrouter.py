@@ -47,10 +47,29 @@ def parse_message(message: str, add_info: Message) -> Event:
             ],
         },
     )
+    
+    if response.status_code != 200:
+        raise Exception(f"OpenRouter API error: {response.text}")
 
-    print(json.dumps(response.json(), indent=2, ensure_ascii=False))
+    data = response.json()
+    content = data['choices'][0]['message']['content']
+    
+    # Simple cleanup if the model creates markdown code block
+    if "```json" in content:
+        content = content.replace("```json", "").replace("```", "")
+    
+    try:
+        event_data = json.loads(content)
+        return Event(
+            name=event_data.get("event-name"),
+            start_time=datetime.fromisoformat(event_data.get("start-time")),
+            finish_time=datetime.fromisoformat(event_data.get("end-time")),
+            participants=event_data.get("participants", [])
+        )
+    except Exception as e:
+        print(f"Failed to parse JSON: {content}")
+        raise e
 
-    return None
 
 
 # completion = client.chat.completions.create(
