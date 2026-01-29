@@ -35,8 +35,51 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/healthz", s.healthz)
 	mux.HandleFunc("/google/auth/start", s.authStart)
 	mux.HandleFunc("/google/callback", s.callback)
+	mux.HandleFunc("/google/status", s.status)
 	return mux
 }
+
+type statusResp struct {
+	Connected bool `json:"connected"`
+}
+
+func (s *Server) status(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if !s.checkBotSecret(w, r) {
+		return
+	}
+
+	tg := r.URL.Query().Get("tg_user_id")
+	if tg == "" {
+		http.Error(w, "missing tg_user_id", http.StatusBadRequest)
+		return
+	}
+
+	var tgUserID int64
+	for _, ch := range tg {
+		if ch < '0' || ch > '9' {
+			http.Error(w, "bad tg_user_id", http.StatusBadRequest)
+			return
+		}
+		tgUserID = tgUserID*10 + int64(ch-'0')
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+	defer cancel()
+
+	ok, err := s.Store.IsConnected(ctx, tgUserID)
+	if err != nil {
+		http.Error(w, "db error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(statusResp{Connected: ok})
+}
+
 
 func (s *Server) checkBotSecret(w http.ResponseWriter, r *http.Request) bool {
 	if s.BotSecret == "" {

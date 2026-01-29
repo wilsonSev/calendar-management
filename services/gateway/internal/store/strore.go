@@ -12,7 +12,6 @@ type Store struct {
 	db *pgxpool.Pool
 }
 
-
 func New(db *pgxpool.Pool) *Store {
 	return &Store{db: db}
 }
@@ -66,4 +65,15 @@ func (s *Store) UpsertTokens(ctx context.Context, tgUserID int64, t GoogleTokens
 			refresh_token = coalesce(nullif(EXCLUDED.refresh_token, ''), google_tokens.refresh_token)
 	`, tgUserID, t.RefreshToken, t.AccessToken, t.AccessExpiresAt, t.Scope)
 	return err
+}
+
+func (s *Store) IsConnected(ctx context.Context, tgUserID int64) (bool, error) {
+	var exists bool
+	err := s.db.QueryRow(ctx, `
+		SELECT exists(
+			SELECT 1 FROM google_tokens
+			WHERE tg_user_id = $1 AND length(refresh_token) > 0
+		)
+	`, tgUserID).Scan(&exists)
+	return exists, err
 }
