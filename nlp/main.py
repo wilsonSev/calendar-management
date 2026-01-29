@@ -8,6 +8,7 @@ import datetime
 
 add_info = Message(datetime.datetime.now(), "Bogdan")
 
+print(event.dataclass_types_to_json(event.Event))
 print(
-    openrouter.parse_message("Сделай встречу на завтра на 6 вечера на 2 часа", add_info)
+    openrouter.parse_message("оуктукшпукгпукшгрпшукрмшгукмшукмш", add_info),
 )
