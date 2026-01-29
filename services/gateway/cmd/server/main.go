@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/wilsonSev/calendar-management/services/gateway/internal/config"
+	"github.com/wilsonSev/calendar-management/services/gateway/config"
 	"github.com/wilsonSev/calendar-management/services/gateway/internal/google"
 	"github.com/wilsonSev/calendar-management/services/gateway/internal/httpapi"
 )
