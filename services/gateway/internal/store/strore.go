@@ -56,10 +56,9 @@ type GoogleTokens struct {
 
 func (s *Store) UpsertTokens(ctx context.Context, tgUserID int64, t GoogleTokens) error {
 	_, err := s.db.Exec(ctx, `
-		INDERT INTO google_tokens (tg_user_id, refresh_token, access_token, access_expires_at, scope)
+		INSERT INTO google_tokens (tg_user_id, refresh_token, access_token, access_expires_at, scope)
 		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (tg_user_id) DO UPDATE SET
-		    refresh_token = EXCLUDED.refresh_token,
 			access_token = EXCLUDED.access_token,
 			access_expires_at = EXCLUDED.access_expires_at,
 			updated_at = now(),

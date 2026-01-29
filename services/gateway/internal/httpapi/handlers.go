@@ -124,6 +124,7 @@ func (s *Server) callback(w http.ResponseWriter, r *http.Request) {
 
 	tgUserID, ok, err := s.Store.ConsumeState(ctx, state)
 	if err != nil {
+		log.Printf("consume state db error: %v", err)
 		http.Error(w, "db error", http.StatusInternalServerError)
 		return
 	}
@@ -147,6 +148,7 @@ func (s *Server) callback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.Store.UpsertTokens(ctx, tgUserID, tokens); err != nil {
+		log.Printf("upsert tokens db error: %v", err)
 		http.Error(w, "db error", http.StatusInternalServerError)
 		return
 	}
