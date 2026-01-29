@@ -1,11 +1,15 @@
 from datetime import datetime
+from enum import Enum, StrEnum
 import json
 from dotenv import load_dotenv
 import os
-from event import Event
+from event import Event, dataclass_types_to_json
 import requests
-import json
 from message import Message
+
+
+class Models(StrEnum):
+    KatCoder = "kwaipilot/kat-coder-pro:free"
 
 
 load_dotenv()
@@ -13,23 +17,24 @@ load_dotenv()
 OPENROUTER_API_KEY = os.getenv("openrouter")
 
 
-# text -> event
-# end_time optional
 def parse_message(message: str, add_info: Message) -> Event:
+
+    def get_response_with_event(model_response: dict) -> Event:
+        return model_response["choices"][0]["message"]["content"]
+
     prompt = f"""
   Распарсь этот текст в следующий JSON формат:
 
-  {{
-    "event-name": string,
-    "start-time": date,
-    "end-time": date,
-    "participants": string[]
-  }}
-
+      {{
+        "event-name": string,
+        "start-time": date,
+        "end-time": date,
+      }}
+   
   Текст:
   {message}
 
-  Верни только JSON без пояснений.
+  Верни только JSON без пояснений, не выдумывай информацию, которой нет в этом сообщении. Если что-то явно не написано здесь, то пропускай это поле. У участников должны быть имена
   """
     response = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
@@ -38,7 +43,7 @@ def parse_message(message: str, add_info: Message) -> Event:
             "Content-Type": "application/json",
         },
         json={
-            "model": "kwaipilot/kat-coder-pro:free",
+            "model": f"{Models.KatCoder}",
             "messages": [
                 {
                     "role": "user",
@@ -48,19 +53,4 @@ def parse_message(message: str, add_info: Message) -> Event:
         },
     )
 
-    print(json.dumps(response.json(), indent=2, ensure_ascii=False))
-
-    return None
-
-
-# completion = client.chat.completions.create(
-#     model="sonar-pro", messages=[{"role": "user", "content": prompt}]
-# )
-# data = json.loads(completion.choices[0].message.content)  # type: ignore
-
-# return Event(
-#     name=data.get("event-name"),
-#     start_time=datetime.fromisoformat(data.get("start-time")),
-#     finish_time=datetime.fromisoformat(data.get("end-time")),
-#     participants=data.get("participants", []),
-# )
+    return get_response_with_event(response.json())
