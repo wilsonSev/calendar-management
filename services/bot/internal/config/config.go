@@ -12,6 +12,7 @@ type Config struct {
 	TelegramToken string
 	GatewayBaseURL string
 	BotSecret string
+	AnalyzerTarget string
 }
 
 func mustEnv(name string) string {
@@ -35,5 +36,6 @@ func Load() Config {
 		TelegramToken:  mustEnv("TELEGRAM_BOT_TOKEN"),
 		GatewayBaseURL: mustEnv("GATEWAY_BASE_URL"),
 		BotSecret:      mustEnv("BOT_SECRET"),
+		AnalyzerTarget: os.Getenv("ANALYZER_TARGET"),
 	}
 }

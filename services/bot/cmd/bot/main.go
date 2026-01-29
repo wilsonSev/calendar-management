@@ -2,19 +2,37 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
+
 	"bot/internal/config"
 	"bot/internal/gateway"
+	"bot/internal/analyzer"
+
+	pb "github.com/andrepribavkin/calendar-management/proto/analyzer/v1"
 )
+
 
 func main() {
 	cfg := config.Load()
 	gw := gateway.New(cfg.GatewayBaseURL, cfg.BotSecret)
+
+	var anlz *analyzer.Client
+	if cfg.AnalyzerTarget != "" {
+		var err error
+		anlz, err = analyzer.New(cfg.AnalyzerTarget)
+		if err != nil {
+			log.Printf("warning: analyzer init failed: %v", err)
+		} else {
+			defer anlz.Close()
+			log.Printf("analyzer connected at %s", cfg.AnalyzerTarget)
+		}
+	}
 
 	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
@@ -32,6 +50,11 @@ func main() {
 			continue
 		}
 		if !upd.Message.IsCommand() {
+			if anlz != nil {
+				handleText(bot, anlz, upd.Message)
+			} else {
+				log.Printf("text message ignored (analyzer not configured): %s", upd.Message.Text)
+			}
 			continue
 		}
 
@@ -90,6 +113,38 @@ func main() {
 		default:
 			send(bot, chatID, "Не знаю эту команду. /help")
 		}
+	}
+}
+
+
+func handleText(bot *tgbotapi.BotAPI, anlz *analyzer.Client, msg *tgbotapi.Message) {
+	send(bot, msg.Chat.ID, "⏳ Анализирую...")
+	
+	resp, err := anlz.Analyze(context.Background(), int64(msg.From.ID), msg.Text)
+	if err != nil {
+		log.Printf("analyze error: %v", err)
+		send(bot, msg.Chat.ID, "Ошибка анализа: "+err.Error())
+		return
+	}
+
+	switch r := resp.Result.(type) {
+	case *pb.AnalyzeTextResponse_CreateEvent:
+		evt := r.CreateEvent
+		start := evt.StartTime.AsTime()
+		end := evt.EndTime.AsTime()
+		send(bot, msg.Chat.ID, fmt.Sprintf("📅 Создать событие?\n\nНазвание: %s\nОписание: %s\nВремя: %s - %s",
+			evt.Title, evt.Description,
+			start.Format(time.RFC822),
+			end.Format(time.RFC822)))
+	
+	case *pb.AnalyzeTextResponse_NeedClarification:
+		send(bot, msg.Chat.ID, "❓ "+r.NeedClarification.Question)
+	
+	case *pb.AnalyzeTextResponse_Error:
+		send(bot, msg.Chat.ID, "❌ "+r.Error.Message)
+	
+	default:
+		send(bot, msg.Chat.ID, "Непонятный ответ от сервера")
 	}
 }
 
