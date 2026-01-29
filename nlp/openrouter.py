@@ -9,7 +9,8 @@ from message import Message
 
 
 class Models(StrEnum):
-    KatCoder = "kwaipilot/kat-coder-pro:free"
+    KatCoder = "z-ai/glm-4.5-air:free"
+    Llama = "meta-llama/llama-3.3-70b-instruct:free"
 
 
 load_dotenv()
@@ -20,6 +21,8 @@ OPENROUTER_API_KEY = os.getenv("openrouter")
 def parse_message(message: str, add_info: Message) -> Event:
 
     def get_response_with_event(model_response: dict) -> Event:
+        with open("dump.json", "w") as file:
+            json.dump(model_response, file)
         return model_response["choices"][0]["message"]["content"]
 
     prompt = f"""
@@ -43,7 +46,7 @@ def parse_message(message: str, add_info: Message) -> Event:
             "Content-Type": "application/json",
         },
         json={
-            "model": f"{Models.KatCoder}",
+            "model": f"{Models.Llama}",
             "messages": [
                 {
                     "role": "user",
