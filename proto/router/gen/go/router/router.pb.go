@@ -7,11 +7,13 @@
 package routerv0
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -23,8 +25,8 @@ const (
 
 type DateRange struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StartDate     string                 `protobuf:"bytes,1,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate       string                 `protobuf:"bytes,2,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	StartDate     *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
+	EndDate       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -59,24 +61,24 @@ func (*DateRange) Descriptor() ([]byte, []int) {
 	return file_router_router_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *DateRange) GetStartDate() string {
+func (x *DateRange) GetStartDate() *timestamppb.Timestamp {
 	if x != nil {
 		return x.StartDate
 	}
-	return ""
+	return nil
 }
 
-func (x *DateRange) GetEndDate() string {
+func (x *DateRange) GetEndDate() *timestamppb.Timestamp {
 	if x != nil {
 		return x.EndDate
 	}
-	return ""
+	return nil
 }
 
 type DateTimeRange struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StartDatetime string                 `protobuf:"bytes,1,opt,name=start_datetime,json=startDatetime,proto3" json:"start_datetime,omitempty"`
-	EndDatetime   string                 `protobuf:"bytes,2,opt,name=end_datetime,json=endDatetime,proto3" json:"end_datetime,omitempty"`
+	StartDatetime *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_datetime,json=startDatetime,proto3" json:"start_datetime,omitempty"`
+	EndDatetime   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_datetime,json=endDatetime,proto3" json:"end_datetime,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -111,28 +113,31 @@ func (*DateTimeRange) Descriptor() ([]byte, []int) {
 	return file_router_router_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *DateTimeRange) GetStartDatetime() string {
+func (x *DateTimeRange) GetStartDatetime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.StartDatetime
 	}
-	return ""
+	return nil
 }
 
-func (x *DateTimeRange) GetEndDatetime() string {
+func (x *DateTimeRange) GetEndDatetime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.EndDatetime
 	}
-	return ""
+	return nil
 }
 
 type CreateEventRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Title string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Title        string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description  string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Participants []string               `protobuf:"bytes,3,rep,name=participants,proto3" json:"participants,omitempty"`
 	// Types that are valid to be assigned to Time:
 	//
 	//	*CreateEventRequest_Date
 	//	*CreateEventRequest_Datetime
 	Time          isCreateEventRequest_Time `protobuf_oneof:"time"`
+	UserId        string                    `protobuf:"bytes,6,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -174,6 +179,20 @@ func (x *CreateEventRequest) GetTitle() string {
 	return ""
 }
 
+func (x *CreateEventRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateEventRequest) GetParticipants() []string {
+	if x != nil {
+		return x.Participants
+	}
+	return nil
+}
+
 func (x *CreateEventRequest) GetTime() isCreateEventRequest_Time {
 	if x != nil {
 		return x.Time
@@ -199,16 +218,23 @@ func (x *CreateEventRequest) GetDatetime() *DateTimeRange {
 	return nil
 }
 
+func (x *CreateEventRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 type isCreateEventRequest_Time interface {
 	isCreateEventRequest_Time()
 }
 
 type CreateEventRequest_Date struct {
-	Date *DateRange `protobuf:"bytes,2,opt,name=date,proto3,oneof"`
+	Date *DateRange `protobuf:"bytes,4,opt,name=date,proto3,oneof"`
 }
 
 type CreateEventRequest_Datetime struct {
-	Datetime *DateTimeRange `protobuf:"bytes,3,opt,name=datetime,proto3,oneof"`
+	Datetime *DateTimeRange `protobuf:"bytes,5,opt,name=datetime,proto3,oneof"`
 }
 
 func (*CreateEventRequest_Date) isCreateEventRequest_Time() {}
@@ -270,6 +296,8 @@ func (x *CreateEventResponse) GetId() string {
 type CreateTaskRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -307,6 +335,20 @@ func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
 func (x *CreateTaskRequest) GetTitle() string {
 	if x != nil {
 		return x.Title
+	}
+	return ""
+}
+
+func (x *CreateTaskRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateTaskRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
 	}
 	return ""
 }
@@ -367,24 +409,29 @@ var File_router_router_proto protoreflect.FileDescriptor
 
 const file_router_router_proto_rawDesc = "" +
 	"\n" +
-	"\x13router/router.proto\x12\tscheduler\"E\n" +
-	"\tDateRange\x12\x1d\n" +
+	"\x13router/router.proto\x12\tscheduler\x1a\x1fgoogle/protobuf/timestamp.proto\"}\n" +
+	"\tDateRange\x129\n" +
 	"\n" +
-	"start_date\x18\x01 \x01(\tR\tstartDate\x12\x19\n" +
-	"\bend_date\x18\x02 \x01(\tR\aendDate\"Y\n" +
-	"\rDateTimeRange\x12%\n" +
-	"\x0estart_datetime\x18\x01 \x01(\tR\rstartDatetime\x12!\n" +
-	"\fend_datetime\x18\x02 \x01(\tR\vendDatetime\"\x96\x01\n" +
+	"start_date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x125\n" +
+	"\bend_date\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\"\x91\x01\n" +
+	"\rDateTimeRange\x12A\n" +
+	"\x0estart_datetime\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\rstartDatetime\x12=\n" +
+	"\fend_datetime\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\vendDatetime\"\xf5\x01\n" +
 	"\x12CreateEventRequest\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\x12*\n" +
-	"\x04date\x18\x02 \x01(\v2\x14.scheduler.DateRangeH\x00R\x04date\x126\n" +
-	"\bdatetime\x18\x03 \x01(\v2\x18.scheduler.DateTimeRangeH\x00R\bdatetimeB\x06\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\"\n" +
+	"\fparticipants\x18\x03 \x03(\tR\fparticipants\x12*\n" +
+	"\x04date\x18\x04 \x01(\v2\x14.scheduler.DateRangeH\x00R\x04date\x126\n" +
+	"\bdatetime\x18\x05 \x01(\v2\x18.scheduler.DateTimeRangeH\x00R\bdatetime\x12\x17\n" +
+	"\auser_id\x18\x06 \x01(\tR\x06userIdB\x06\n" +
 	"\x04time\"?\n" +
 	"\x13CreateEventResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\")\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"d\n" +
 	"\x11CreateTaskRequest\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\">\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\">\n" +
 	"\x12CreateTaskResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id2\xa4\x01\n" +
@@ -407,25 +454,30 @@ func file_router_router_proto_rawDescGZIP() []byte {
 
 var file_router_router_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_router_router_proto_goTypes = []any{
-	(*DateRange)(nil),           // 0: scheduler.DateRange
-	(*DateTimeRange)(nil),       // 1: scheduler.DateTimeRange
-	(*CreateEventRequest)(nil),  // 2: scheduler.CreateEventRequest
-	(*CreateEventResponse)(nil), // 3: scheduler.CreateEventResponse
-	(*CreateTaskRequest)(nil),   // 4: scheduler.CreateTaskRequest
-	(*CreateTaskResponse)(nil),  // 5: scheduler.CreateTaskResponse
+	(*DateRange)(nil),             // 0: scheduler.DateRange
+	(*DateTimeRange)(nil),         // 1: scheduler.DateTimeRange
+	(*CreateEventRequest)(nil),    // 2: scheduler.CreateEventRequest
+	(*CreateEventResponse)(nil),   // 3: scheduler.CreateEventResponse
+	(*CreateTaskRequest)(nil),     // 4: scheduler.CreateTaskRequest
+	(*CreateTaskResponse)(nil),    // 5: scheduler.CreateTaskResponse
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
 }
 var file_router_router_proto_depIdxs = []int32{
-	0, // 0: scheduler.CreateEventRequest.date:type_name -> scheduler.DateRange
-	1, // 1: scheduler.CreateEventRequest.datetime:type_name -> scheduler.DateTimeRange
-	2, // 2: scheduler.Scheduler.CreateEvent:input_type -> scheduler.CreateEventRequest
-	4, // 3: scheduler.Scheduler.CreateTask:input_type -> scheduler.CreateTaskRequest
-	3, // 4: scheduler.Scheduler.CreateEvent:output_type -> scheduler.CreateEventResponse
-	5, // 5: scheduler.Scheduler.CreateTask:output_type -> scheduler.CreateTaskResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6, // 0: scheduler.DateRange.start_date:type_name -> google.protobuf.Timestamp
+	6, // 1: scheduler.DateRange.end_date:type_name -> google.protobuf.Timestamp
+	6, // 2: scheduler.DateTimeRange.start_datetime:type_name -> google.protobuf.Timestamp
+	6, // 3: scheduler.DateTimeRange.end_datetime:type_name -> google.protobuf.Timestamp
+	0, // 4: scheduler.CreateEventRequest.date:type_name -> scheduler.DateRange
+	1, // 5: scheduler.CreateEventRequest.datetime:type_name -> scheduler.DateTimeRange
+	2, // 6: scheduler.Scheduler.CreateEvent:input_type -> scheduler.CreateEventRequest
+	4, // 7: scheduler.Scheduler.CreateTask:input_type -> scheduler.CreateTaskRequest
+	3, // 8: scheduler.Scheduler.CreateEvent:output_type -> scheduler.CreateEventResponse
+	5, // 9: scheduler.Scheduler.CreateTask:output_type -> scheduler.CreateTaskResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_router_router_proto_init() }
