@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -28,7 +29,7 @@ type GoogleConfig struct {
 }
 
 func MustLoad() *Config {
-	path := fetchConfigPath()
+	path := resolveConfigPath(fetchConfigPath())
 
 	if path == "" {
 		panic("config file path is empty")
@@ -49,12 +50,29 @@ func MustLoad() *Config {
 
 func fetchConfigPath() string {
 	var res string
-	flag.StringVar(&res, "config", "config.yaml", "config file path")
+	flag.StringVar(&res, "config", "", "config file path")
 	flag.Parse()
 
-	if res == "" {
-		res = os.Getenv("CONFIG_PATH")
+	return strings.TrimSpace(res)
+}
+
+func resolveConfigPath(path string) string {
+	candidates := []string{
+		path,
+		strings.TrimSpace(os.Getenv("CONFIG_PATH")),
+		"config/local.yaml",
+		"router/config/local.yaml",
 	}
 
-	return res
+	for _, candidate := range candidates {
+		if candidate == "" {
+			continue
+		}
+
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate
+		}
+	}
+
+	return path
 }

@@ -34,10 +34,10 @@ func (o *OAuth) BuildAuthURL(state string) string {
 	q.Set("redirect_uri", o.RedirectURI)
 	q.Set("response_type", "code")
 	q.Set("scope", strings.Join(o.Scopes, " "))
-	q.Set("access_type", "offline")
-	q.Set("prompt", "consent")
 	q.Set("state", state)
 	q.Set("include_granted_scopes", "true")
+	q.Set("access_type", "offline")
+	q.Set("prompt", "consent")
 	u.RawQuery = q.Encode()
 	return u.String()
 }

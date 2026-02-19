@@ -72,7 +72,7 @@ func (s *Store) IsConnected(ctx context.Context, tgUserID int64) (bool, error) {
 	err := s.db.QueryRow(ctx, `
 		SELECT exists(
 			SELECT 1 FROM google_tokens
-			WHERE tg_user_id = $1 AND length(refresh_token) > 0
+			WHERE tg_user_id = $1 AND LENGTH(refresh_token) > 0
 		)
 	`, tgUserID).Scan(&exists)
 	return exists, err

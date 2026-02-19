@@ -1,2 +1,9 @@
 .env
+services/bot/.env
+nlp/.env
+nlp/venv/
+nlp/gen/
+nlp/__pycache__/
+__pycache__/
+*.pyc
 .idea

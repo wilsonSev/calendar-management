@@ -2,14 +2,19 @@ package main
 
 import (
 	"log"
+	"os"
+	"strings"
 
-	"github.com/wilsonSev/calendar-management/services/gateway/config"
 	"github.com/wilsonSev/calendar-management/services/gateway/telegram-bot/bot"
 )
 
 func main() {
-	config := config.MustLoad()
-	bot, err := bot.New(config.Token)
+	token := strings.TrimSpace(os.Getenv("TELEGRAM_BOT_TOKEN"))
+	if token == "" {
+		log.Fatal("TELEGRAM_BOT_TOKEN must be set")
+	}
+
+	bot, err := bot.New(token)
 	if err != nil {
 		log.Fatal("failed to create bot:", err)
 	}

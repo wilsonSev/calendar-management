@@ -15,10 +15,12 @@ class Models(StrEnum):
 
 load_dotenv()
 
-OPENROUTER_API_KEY = os.getenv("openrouter")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("openrouter")
 
 
 def parse_message(message: str, add_info: Message) -> Event:
+    if not OPENROUTER_API_KEY:
+        raise RuntimeError("OPENROUTER_API_KEY is not set")
 
     def get_response_with_event(model_response: dict) -> Event:
         with open("dump.json", "w") as file:
@@ -83,4 +85,3 @@ def parse_message(message: str, add_info: Message) -> Event:
         raise Exception(f"OpenRouter API error: {response.text}")
 
     return get_response_with_event(response.json())
-

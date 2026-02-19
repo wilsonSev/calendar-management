@@ -1,15 +1,13 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
     container_name: calendar-postgres
     environment:
-      POSTGRES_USER: calendar_user
-      POSTGRES_PASSWORD: calendar_pass
-      POSTGRES_DB: calendar_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-calendar_db}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
