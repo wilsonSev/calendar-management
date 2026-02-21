@@ -1,0 +1,3 @@
+INFO:root:Server started, listening on 50052
+INFO:root:Received analysis request: создай ивент на 13:00 на 5 марта с названием "Поесть"
+ERROR:root:Error processing request: OpenRouter API error: {"error":{"message":"Missing Authentication header","code":401}}

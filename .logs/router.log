@@ -1,0 +1,11 @@
+time=2026-02-22T02:24:58.749+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x105011108?, 0x1400027e740?}, 0x140001a1ac0, 0xc383, {0x140001ee500, 0x47}, 0x14000253f20?, 0x34630b8a000, {{0x140001a8780?, 0x1044cc00c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2

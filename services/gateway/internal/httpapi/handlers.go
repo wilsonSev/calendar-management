@@ -170,6 +170,7 @@ func (s *Server) callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !ok {
+		log.Printf("State check failed. Received state: %s", state)
 		http.Error(w, "invalid/expired state", http.StatusBadRequest)
 		return
 	}

@@ -3,6 +3,7 @@ package store
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -25,32 +26,45 @@ func (s *Store) EnsureUser(ctx context.Context, tgUserID int64) error {
 	return err
 }
 
-func (s *Store) SaveState(ctx context.Context, state string, tgUserID int64, expiresAt time.Time) error{
+func (s *Store) SaveState(ctx context.Context, state string, tgUserID int64, expiresAt time.Time) error {
 	_, err := s.db.Exec(ctx, `
 	    INSERT INTO oauth_state (state, tg_user_id, expires_at)
-		VALUES ($1, $2, $3)
-	`, state, tgUserID, expiresAt)
+		VALUES ($1, $2, NOW() + interval '10 minutes')
+	`, state, tgUserID)
 	return err
 }
 
 func (s *Store) ConsumeState(ctx context.Context, state string) (tgUserID int64, ok bool, err error) {
 	err = s.db.QueryRow(ctx, `
 		DELETE FROM oauth_state
-		WHERE state = $1 and expires_at > now()
+		WHERE state = $1 AND expires_at > NOW()
 		RETURNING tg_user_id
 	`, state).Scan(&tgUserID)
 
 	if err != nil {
+		log.Printf("ConsumeState failed for state='%s': %v", state, err)
+
+		var dbNow, expiresAt time.Time
+		var exists bool
+		_ = s.db.QueryRow(ctx, "SELECT NOW()").Scan(&dbNow)
+		errExists := s.db.QueryRow(ctx, "SELECT expires_at FROM oauth_state WHERE state=$1", state).Scan(&expiresAt)
+		exists = errExists == nil
+
+		if exists {
+			log.Printf("DEBUG: State '%s' exists. DB Time: %v, ExpiresAt: %v. Expired: %v", state, dbNow, expiresAt, expiresAt.Before(dbNow))
+		} else {
+			log.Printf("DEBUG: State '%s' not found in DB at all. DB Time: %v", state, dbNow)
+		}
 		return 0, false, nil
 	}
 	return tgUserID, true, nil
 }
 
 type GoogleTokens struct {
-	AccessToken       string
-	RefreshToken      string
-	AccessExpiresAt   time.Time
-	Scope             string
+	AccessToken     string
+	RefreshToken    string
+	AccessExpiresAt time.Time
+	Scope           string
 }
 
 func (s *Store) UpsertTokens(ctx context.Context, tgUserID int64, t GoogleTokens) error {

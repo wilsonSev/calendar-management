@@ -29,3 +29,63 @@ services/gateway/internal/google/oauth.go:52:2: syntax error: non-declaration st
 services/gateway/internal/google/oauth.go:72:2: syntax error: non-declaration statement outside function body
 2026/02/19 23:31:16 DB ping OK
 2026/02/19 23:31:16 listening on :8081
+2026/02/21 21:00:59 DB ping OK
+2026/02/21 21:00:59 listening on :8081
+2026/02/21 21:00:59 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:05:50 DB ping OK
+2026/02/21 21:05:50 listening on :8081
+2026/02/21 21:05:50 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:06:07 DB ping OK
+2026/02/21 21:06:07 listening on :8081
+2026/02/21 21:06:07 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:15:46 DB ping OK
+2026/02/21 21:15:46 listening on :8081
+2026/02/21 21:15:46 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:20:32 DB ping OK
+2026/02/21 21:20:32 listening on :8081
+2026/02/21 21:20:32 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:24:52 DB ping OK
+2026/02/21 21:24:52 listening on :8081
+2026/02/21 21:24:52 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:43:00 DB ping OK
+2026/02/21 21:43:00 listening on :8081
+2026/02/21 21:43:00 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 21:45:51 DB ping OK
+2026/02/21 21:45:51 listening on :8081
+signal: killed
+2026/02/21 21:53:21 DB ping OK
+2026/02/21 21:53:21 listening on :8081
+2026/02/21 21:59:34 DB ping OK
+2026/02/21 21:59:34 listening on :8081
+2026/02/21 21:59:34 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 22:12:31 DB ping OK
+2026/02/21 22:12:31 listening on :8081
+2026/02/21 22:12:31 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 22:22:38 DB ping OK
+2026/02/21 22:22:38 listening on :8081
+2026/02/21 22:22:38 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 22:29:02 DB ping OK
+2026/02/21 22:29:02 listening on :8081
+2026/02/21 22:32:52 ConsumeState failed for state='RrHBBBmh5yQWs3bf6rK4YF9OZGkg9mNnhh2L458Kxas': no rows in result set
+2026/02/21 22:32:52 DEBUG: State 'RrHBBBmh5yQWs3bf6rK4YF9OZGkg9mNnhh2L458Kxas' exists but failed DELETE condition (likely expired)
+2026/02/21 22:32:52 State check failed. Received state: RrHBBBmh5yQWs3bf6rK4YF9OZGkg9mNnhh2L458Kxas
+2026/02/21 23:07:32 DB ping OK
+2026/02/21 23:07:32 listening on :8081
+2026/02/21 23:07:32 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/21 23:14:51 DB ping OK
+2026/02/21 23:14:51 listening on :8081
+2026/02/21 23:14:51 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/22 02:24:58 DB ping OK
+2026/02/22 02:24:58 listening on :8081
