@@ -1,14 +1,49 @@
-from os import getenv
+"""Main entry point for NLP service"""
+from datetime import datetime
 from dotenv import load_dotenv
-import event
+
 import openrouter
 from message import Message
-import datetime
+from scheduler_client import SchedulerClient
+
+load_dotenv()
 
 
-add_info = Message(datetime.datetime.now(), "Bogdan")
+def process_user_message(user_message: str, user_id: str, username: str = "User"):
+    """
+    Process user message and create event in scheduler
+    
+    Args:
+        user_message: Raw text from user
+        user_id: User ID (e.g., Telegram user ID)
+        username: Username for additional context
+    """
+    # Parse message using OpenRouter LLM
+    add_info = Message(datetime.now(), username)
+    parsed_event = openrouter.parse_message(user_message, add_info)
+    
+    print(f"Parsed event: {parsed_event}")
+    
+    # Send to Scheduler service via gRPC
+    with SchedulerClient() as client:
+        success, event_id = client.create_event(
+            title=parsed_event.name,
+            description=f"Created by {username}",
+            user_id=str(user_id),
+            start_time=parsed_event.start_time,
+            end_time=parsed_event.finish_time,
+            participants=[]
+        )
+        
+        if success:
+            print(f"✓ Event created successfully! ID: {event_id}")
+        else:
+            print(f"✗ Failed to create event")
+        
+        return success, event_id
 
-print(event.dataclass_types_to_json(event.Event))
-print(
-    openrouter.parse_message("оуктукшпукгпукшгрпшукрмшгукмшукмш", add_info),
-)
+
+if __name__ == "__main__":
+    # Example usage
+    test_message = "Встреча с командой завтра в 15:00, продлится 2 часа"
+    process_user_message(test_message, user_id="123456", username="Bogdan")

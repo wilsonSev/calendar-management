@@ -1,21 +1,17 @@
 from datetime import datetime
-from enum import Enum, StrEnum
+from enum import Enum
 import json
-from dotenv import load_dotenv
-import os
-from event import Event, dataclass_types_to_json
 import requests
+
+from event import Event
 from message import Message
+from config import OPENROUTER_API_KEY
 
 
-class Models(StrEnum):
+class Models(str, Enum):
+    """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
     Llama = "meta-llama/llama-3.3-70b-instruct:free"
-
-
-load_dotenv()
-
-OPENROUTER_API_KEY = os.getenv("openrouter")
 
 
 def parse_message(message: str, add_info: Message) -> Event:
