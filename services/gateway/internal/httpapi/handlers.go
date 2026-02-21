@@ -15,7 +15,6 @@ import (
 	"github.com/wilsonSev/calendar-management/services/gateway/internal/store"
 )
 
-
 type Server struct {
 	Store     *store.Store
 	OAuth     *google.OAuth
@@ -79,7 +78,6 @@ func (s *Server) status(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(statusResp{Connected: ok})
 }
-
 
 func (s *Server) checkBotSecret(w http.ResponseWriter, r *http.Request) bool {
 	if s.BotSecret == "" {
@@ -181,6 +179,10 @@ func (s *Server) callback(w http.ResponseWriter, r *http.Request) {
 		log.Printf("exchange code error: %v", err)
 		http.Error(w, "token exchange failed", http.StatusBadGateway)
 		return
+	}
+
+	if tr.RefreshToken == "" {
+		log.Printf("Warning: No refresh token received for user %d", tgUserID)
 	}
 
 	tokens := store.GoogleTokens{
