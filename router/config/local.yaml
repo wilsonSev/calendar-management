@@ -1,5 +1,5 @@
 env: "local"
-database_url: "postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable"
+database_url: "postgresql://postgres.fjpgtkbfdzhcalraskan:USX36hFfw1jPfe4P@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require"
 storage_timeout: "5s"
 token_ttl: "1h"
 
@@ -8,5 +8,5 @@ grpc:
   timeout: "5s"
 
 google:
-  client_id: "your-google-client-id"
-  client_secret: "your-google-client-secret"
+  client_id: ""
+  client_secret: ""

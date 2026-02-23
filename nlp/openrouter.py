@@ -12,6 +12,20 @@ class Models(str, Enum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
     Llama = "meta-llama/llama-3.3-70b-instruct:free"
+
+
+load_dotenv()
+# Also try loading from the current file's directory (nlp/.env)
+env_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("openrouter")
+
+
+def parse_message(message: str, add_info: Message) -> Event:
+    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY == "your_key_here":
+        raise RuntimeError(f"OPENROUTER_API_KEY is not set or invalid (value: {OPENROUTER_API_KEY[:5]}...)")
     Stepfun = "stepfun/step-3.5-flash:free"
 
 

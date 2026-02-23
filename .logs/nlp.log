@@ -1,0 +1,13 @@
+INFO:root:Server started, listening on 50052
+INFO:root:Received analysis request: создай ивент на 13:00 на 5 марта с названием "Поесть"
+ERROR:root:Error processing request: OpenRouter API error: {"error":{"message":"Missing Authentication header","code":401}}
+INFO:root:Server started, listening on 50052
+INFO:root:Received analysis request: создай ивент на 13:00 на 5 марта с названием "Поесть"
+ERROR:root:Error processing request: OpenRouter API error: {"error":{"message":"Provider returned error","code":429,"metadata":{"raw":"meta-llama/llama-3.3-70b-instruct:free is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"Venice","is_byok":false}},"user_id":"user_35T132HiWshGhYk6FvoIdLPU7z6"}
+INFO:root:Server started, listening on 50052
+INFO:root:Server started, listening on 50052
+INFO:root:Server started, listening on 50052
+INFO:root:Server started, listening on 50052
+INFO:root:Server started, listening on 50052
+INFO:root:Server started, listening on 50052
+INFO:root:Server started, listening on 50052

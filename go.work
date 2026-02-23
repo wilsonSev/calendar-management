@@ -5,4 +5,5 @@ use (
 	./router
 	./services/bot
 	./services/gateway
+	./proto/router/gen/go/router
 )
