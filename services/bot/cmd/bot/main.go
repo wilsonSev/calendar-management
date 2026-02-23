@@ -15,6 +15,10 @@ import (
 	"bot/internal/analyzer"
 
 	pb "github.com/andrepribavkin/calendar-management/proto/analyzer/v1"
+	router_pb "calendar-management/proto/router"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 
@@ -33,6 +37,13 @@ func main() {
 			log.Printf("analyzer connected at %s", cfg.AnalyzerTarget)
 		}
 	}
+
+	// Connect to router
+	routerConn, err := grpc.NewClient(cfg.RouterTarget, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Printf("warning: router connect failed: %v", err)
+	}
+	routerClient := router_pb.NewSchedulerClient(routerConn)
 
 	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
@@ -65,11 +76,11 @@ func main() {
 		switch cmd {
 		case "start":
 			send(bot, chatID,
-				"Привет! Я помогу подключить Google Calendar.\n\nКоманды:\n/connect — подключить Google\n/status — статус подключения\n/help — помощь")
+				"Привет! Я помогу подключить Google Calendar.\n\nКоманды:\n/connect — подключить Google\n/status — статус подключения\n/test_add — тест создания события\n/help — помощь")
 
 		case "help":
 			send(bot, chatID,
-				"/connect — получить ссылку на подключение Google\n/status — проверить, подключен ли Google\n\nПосле подключения можно будет добавлять события текстом.")
+				"/connect — получить ссылку на подключение Google\n/status — проверить, подключен ли Google\n/test_add — создать тестовое событие (завтра в 10:00)\n\nПосле подключения можно будет добавлять события текстом.")
 
 		case "connect":
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -108,6 +119,33 @@ func main() {
 				send(bot, chatID, "✅ Google подключен.")
 			} else {
 				send(bot, chatID, "❌ Google не подключен. Нажми /connect")
+			}
+		
+		case "test_add":
+			start := time.Now().Add(24 * time.Hour)
+			end := start.Add(1 * time.Hour)
+
+			req := &router_pb.CreateEventRequest{
+				Title:       "Test Event from Bot",
+				Description: "Created via /test_add bypassing NLP",
+				UserId:      fmt.Sprintf("%d", tgUserID),
+				Time: &router_pb.CreateEventRequest_Datetime{
+					Datetime: &router_pb.DateTimeRange{
+						StartDatetime: timestamppb.New(start),
+						EndDatetime:   timestamppb.New(end),
+					},
+				},
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			resp, err := routerClient.CreateEvent(ctx, req)
+			cancel()
+			
+			if err != nil {
+				send(bot, chatID, "❌ Ошибка router: " + err.Error())
+				log.Printf("CreateEvent error: %v", err)
+			} else {
+				send(bot, chatID, fmt.Sprintf("✅ Событие создано! ID: %s, Success: %v", resp.Id, resp.Success))
 			}
 
 		default:

@@ -24,8 +24,8 @@ type GRPCConfig struct {
 }
 
 type GoogleConfig struct {
-	ClientID     string `yaml:"client_id" env-required:"true"`
-	ClientSecret string `yaml:"client_secret" env-required:"true"`
+	ClientID     string `yaml:"client_id" env:"GOOGLE_CLIENT_ID" env-required:"true"`
+	ClientSecret string `yaml:"client_secret" env:"GOOGLE_CLIENT_SECRET" env-required:"true"`
 }
 
 func MustLoad() *Config {

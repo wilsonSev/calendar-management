@@ -30,6 +30,8 @@ func (s *Store) SaveState(ctx context.Context, state string, tgUserID int64, exp
 	_, err := s.db.Exec(ctx, `
 	    INSERT INTO oauth_state (state, tg_user_id, expires_at)
 		VALUES ($1, $2, NOW() + interval '10 minutes')
+		ON CONFLICT (state) DO UPDATE 
+		SET expires_at = EXCLUDED.expires_at, tg_user_id = EXCLUDED.tg_user_id
 	`, state, tgUserID)
 	return err
 }

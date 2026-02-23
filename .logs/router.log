@@ -9,3 +9,91 @@ calendar-management/router/v2/internal/app.New({0x105011108?, 0x1400027e740?}, 0
 main.main()
 	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
 exit status 2
+time=2026-02-22T21:19:24.584+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x105755108?, 0x1400027e740?}, 0x140001a1ac0, 0xc383, {0x140001f0500, 0x47}, 0x14000255f20?, 0x34630b8a000, {{0x140001a8780?, 0x104c1000c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:39:50.581+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x1054d9108?, 0x1400027e740?}, 0x140001a1ac0, 0xc383, {0x140001f0500, 0x47}, 0x14000255f20?, 0x34630b8a000, {{0x140001a8780?, 0x10499400c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:40:44.315+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x104f35108?, 0x140001ee740?}, 0x14000031ae0, 0xc383, {0x1400003c5f0, 0x47}, 0x140001c5f20?, 0x34630b8a000, {{0x14000034870?, 0x1043f000c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:42:23.287+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x1057c5108?, 0x140000b7240?}, 0x14000030fa0, 0xc383, {0x1400003c550, 0x47}, 0x140000a3f20?, 0x34630b8a000, {{0x140000346a8?, 0x104c8000c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:44:11.525+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x103a91108?, 0x140000ab3c0?}, 0x140000312d0, 0xc383, {0x1400003c550, 0x47}, 0x140000c7f20?, 0x34630b8a000, {{0x14000034708?, 0x102f4c00c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:48:40.192+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x103081108?, 0x14000286740?}, 0x140001afac0, 0xc383, {0x140001fa500, 0x47}, 0x1400025df20?, 0x34630b8a000, {{0x140001b6780?, 0x10253c00c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:51:33.269+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x104d15108?, 0x140001ee740?}, 0x14000031b10, 0xc383, {0x1400003c5f0, 0x47}, 0x140001c5f20?, 0x34630b8a000, {{0x14000034870?, 0x1041d000c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2
+time=2026-02-22T21:58:39.552+03:00 level=INFO msg="starting router microservice" config="&{Env:local DatabaseURL:postgres://postgres:postgres@localhost:5432/calendar_db?sslmode=disable StorageTimeout:5s TokenTTL:1h0m0s GRPC:{Port:50051 Timeout:5s} Google:{ClientID:your-google-client-id ClientSecret:your-google-client-secret}}"
+panic: failed to init storage: failed to connect to database: failed to connect to `user=postgres database=calendar_db`:
+		[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: connection refused
+		127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+
+goroutine 1 [running]:
+calendar-management/router/v2/internal/app.New({0x102d75108?, 0x140001ee740?}, 0x14000031ae0, 0xc383, {0x1400003c5f0, 0x47}, 0x140001c5f20?, 0x34630b8a000, {{0x14000034858?, 0x10223000c?}, ...})
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/internal/app/app.go:31 +0x140
+main.main()
+	/Users/andrepribavkin/calendar-management2/calendar-management/router/cmd/router/main.go:30 +0x134
+exit status 2

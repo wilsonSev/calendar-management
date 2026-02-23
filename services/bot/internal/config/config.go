@@ -13,6 +13,7 @@ type Config struct {
 	GatewayBaseURL string
 	BotSecret string
 	AnalyzerTarget string
+	RouterTarget string
 }
 
 func mustEnv(name string) string {
@@ -37,5 +38,6 @@ func Load() Config {
 		GatewayBaseURL: mustEnv("GATEWAY_BASE_URL"),
 		BotSecret:      mustEnv("BOT_SECRET"),
 		AnalyzerTarget: os.Getenv("ANALYZER_TARGET"),
+		RouterTarget:   "localhost:50051",
 	}
 }

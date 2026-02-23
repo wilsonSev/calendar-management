@@ -117,7 +117,7 @@ start_router() {
   echo "starting router..."
   (
     cd "${ROOT_DIR}"
-    ENV_FILE=router/config/local.yaml GOCACHE="${GOCACHE_DIR}" go run ./router/cmd/router/main.go
+    exec env ENV_FILE=router/config/local.yaml GOCACHE="${GOCACHE_DIR}" go run ./router/cmd/router/main.go
   ) >>"${ROUTER_LOG_FILE}" 2>&1 &
   echo $! >"${ROUTER_PID_FILE}"
 }
@@ -133,7 +133,7 @@ start_gateway() {
   echo "starting gateway..."
   (
     cd "${ROOT_DIR}"
-    ENV_FILE=.env GOCACHE="${GOCACHE_DIR}" go run ./services/gateway/cmd/server/main.go
+    exec env ENV_FILE=.env GOCACHE="${GOCACHE_DIR}" go run ./services/gateway/cmd/server/main.go
   ) >>"${GATEWAY_LOG_FILE}" 2>&1 &
   echo $! >"${GATEWAY_PID_FILE}"
 }
@@ -149,7 +149,7 @@ start_bot() {
   echo "starting bot..."
   (
     cd "${ROOT_DIR}"
-    ENV_FILE=services/bot/.env ANALYZER_TARGET=localhost:50052 GOCACHE="${GOCACHE_DIR}" go run ./services/bot/cmd/bot/main.go
+    exec env ENV_FILE=services/bot/.env ANALYZER_TARGET=localhost:50052 GOCACHE="${GOCACHE_DIR}" go run ./services/bot/cmd/bot/main.go
   ) >>"${BOT_LOG_FILE}" 2>&1 &
   echo $! >"${BOT_PID_FILE}"
 }

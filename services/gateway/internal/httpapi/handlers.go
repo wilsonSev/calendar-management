@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -134,11 +135,8 @@ func (s *Server) authStart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	state, err := randomState(32)
-	if err != nil {
-		http.Error(w, "state gen error", http.StatusInternalServerError)
-		return
-	}
+	// Use tgUserID as state
+	state := fmt.Sprintf("%d", req.TgUserID)
 
 	if err := s.Store.SaveState(ctx, state, req.TgUserID, time.Now().Add(10*time.Minute)); err != nil {
 		http.Error(w, "db error", http.StatusInternalServerError)

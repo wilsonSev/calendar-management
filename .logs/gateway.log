@@ -89,3 +89,32 @@ exit status 1
 exit status 1
 2026/02/22 02:24:58 DB ping OK
 2026/02/22 02:24:58 listening on :8081
+2026/02/22 21:19:26 DB ping OK
+2026/02/22 21:19:26 listening on :8081
+./scripts/stack.sh: line 125: 31671 Killed: 9               ENV_FILE=.env GOCACHE="${GOCACHE_DIR}" go run ./services/gateway/cmd/server/main.go
+2026/02/22 21:39:50 DB ping OK
+2026/02/22 21:39:50 listening on :8081
+2026/02/22 21:39:50 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/22 21:40:45 DB ping OK
+2026/02/22 21:40:45 listening on :8081
+2026/02/22 21:40:45 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/22 21:42:25 DB ping OK
+2026/02/22 21:42:25 listening on :8081
+2026/02/22 21:42:25 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/22 21:44:13 DB ping OK
+2026/02/22 21:44:13 listening on :8081
+2026/02/22 21:44:13 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/22 21:48:42 DB ping OK
+2026/02/22 21:48:42 listening on :8081
+2026/02/22 21:48:42 http server: listen tcp :8081: bind: address already in use
+exit status 1
+2026/02/22 21:51:32 DB ping OK
+2026/02/22 21:51:32 listening on :8081
+2026/02/22 21:58:41 DB ping OK
+2026/02/22 21:58:41 listening on :8081
+2026/02/22 21:58:41 http server: listen tcp :8081: bind: address already in use
+exit status 1
