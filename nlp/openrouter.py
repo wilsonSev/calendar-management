@@ -1,34 +1,17 @@
 from datetime import datetime
-from enum import Enum, StrEnum
+from enum import Enum
 import json
 import requests
-import os
-from dotenv import load_dotenv
 
 from event import Event
 from message import Message
-# from config import OPENROUTER_API_KEY
+from config import OPENROUTER_API_KEY
 
 
-class Models(StrEnum):
+class Models(str, Enum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
     Llama = "meta-llama/llama-3.3-70b-instruct:free"
-    Stepfun = "stepfun/step-3.5-flash:free"
-
-
-load_dotenv()
-# Also try loading from the current file's directory (nlp/.env)
-env_path = os.path.join(os.path.dirname(__file__), '.env')
-if os.path.exists(env_path):
-    load_dotenv(env_path)
-
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("openrouter")
-
-
-def parse_message(message: str, add_info: Message) -> Event:
-    if not OPENROUTER_API_KEY or OPENROUTER_API_KEY == "your_key_here":
-        raise RuntimeError(f"OPENROUTER_API_KEY is not set or invalid (value: {OPENROUTER_API_KEY[:5]}...)")
     Stepfun = "stepfun/step-3.5-flash:free"
 
 
@@ -52,7 +35,7 @@ def parse_message(message: str, add_info: Message) -> Event:
             start_str = event_data.get("start-time")
             end_str = event_data.get("end-time")
             
-            start_time = datetime.fromisoformat(start_str) if start_str else datetime.now() # Fallback or error
+            start_time = datetime.fromisoformat(start_str) if start_str else datetime.now()
             finish_time = datetime.fromisoformat(end_str) if end_str else start_time
 
             return Event(
@@ -65,19 +48,20 @@ def parse_message(message: str, add_info: Message) -> Event:
             raise e
 
     prompt = f"""
-  Распарсь этот текст в следующий JSON формат:
+Распарсь этот текст в следующий JSON формат:
 
-      {{
-        "event-name": string,
-        "start-time": date,
-        "end-time": date,
-      }}
-   
-  Текст:
-  {message}
+{{
+  "event-name": string,
+  "start-time": date,
+  "end-time": date,
+}}
 
-  Верни только JSON без пояснений, не выдумывай информацию, которой нет в этом сообщении. Если что-то явно не написано здесь, то пропускай это поле.
-  """
+Текст:
+{message}
+
+Верни только JSON без пояснений, не выдумывай информацию, которой нет в этом сообщении. Если что-то явно не написано здесь, то пропускай это поле.
+"""
+    
     response = requests.post(
         url="https://openrouter.ai/api/v1/chat/completions",
         headers={
@@ -85,7 +69,7 @@ def parse_message(message: str, add_info: Message) -> Event:
             "Content-Type": "application/json",
         },
         json={
-            "model": f"{Models.Stepfun}",
+            "model": Models.Stepfun,
             "messages": [
                 {
                     "role": "user",
@@ -98,6 +82,7 @@ def parse_message(message: str, add_info: Message) -> Event:
     if response.status_code != 200:
         raise Exception(f"OpenRouter API error: {response.text}")
 
-
-    print(response.json())
+    print("Response from OpenRouter:")
+    print(json.dumps(response.json(), indent=2, ensure_ascii=False))
+    
     return get_response_with_event(response.json())
