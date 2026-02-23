@@ -1,12 +1,9 @@
 """Main entry point for NLP service"""
 from datetime import datetime
-from dotenv import load_dotenv
 
 import openrouter
 from message import Message
 from scheduler_client import SchedulerClient
-
-load_dotenv()
 
 
 def process_user_message(user_message: str, user_id: str, username: str = "User"):
@@ -44,6 +41,26 @@ def process_user_message(user_message: str, user_id: str, username: str = "User"
 
 
 if __name__ == "__main__":
-    # Example usage
+    # Test OpenRouter parsing only (without gRPC)
+    print("=== Testing OpenRouter LLM parsing ===\n")
+    
     test_message = "Встреча с командой завтра в 15:00, продлится 2 часа"
-    process_user_message(test_message, user_id="123456", username="Bogdan")
+    print(f"Input message: {test_message}\n")
+    
+    # Parse message using OpenRouter
+    add_info = Message(datetime.now(), "Bogdan")
+    
+    try:
+        parsed_event = openrouter.parse_message(test_message, add_info)
+        
+        print("✓ Parsing successful!")
+        print(f"\nParsed Event:")
+        print(f"  Name: {parsed_event.name}")
+        print(f"  Start: {parsed_event.start_time}")
+        print(f"  End: {parsed_event.finish_time}")
+        
+    except Exception as e:
+        print(f"✗ Error: {e}")
+    
+    # Uncomment below to test full flow with gRPC:
+    # process_user_message(test_message, user_id="123456", username="Bogdan")

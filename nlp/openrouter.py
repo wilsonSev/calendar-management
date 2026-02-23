@@ -12,16 +12,12 @@ class Models(str, Enum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
     Llama = "meta-llama/llama-3.3-70b-instruct:free"
-
-
-load_dotenv()
-
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("openrouter")
+    Stepfun = "stepfun/step-3.5-flash:free"
 
 
 def parse_message(message: str, add_info: Message) -> Event:
     if not OPENROUTER_API_KEY:
-        raise RuntimeError("OPENROUTER_API_KEY is not set")
+        raise RuntimeError("OPENROUTER_API_KEY is not set. Add 'openrouter=your_key' to .env file")
 
     def get_response_with_event(model_response: dict) -> Event:
         with open("dump.json", "w") as file:
@@ -72,7 +68,7 @@ def parse_message(message: str, add_info: Message) -> Event:
             "Content-Type": "application/json",
         },
         json={
-            "model": f"{Models.Llama}",
+            "model": f"{Models.Stepfun}",
             "messages": [
                 {
                     "role": "user",
@@ -85,4 +81,6 @@ def parse_message(message: str, add_info: Message) -> Event:
     if response.status_code != 200:
         raise Exception(f"OpenRouter API error: {response.text}")
 
+
+    print(response.json())
     return get_response_with_event(response.json())
