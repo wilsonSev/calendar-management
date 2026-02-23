@@ -11,8 +11,13 @@ from config import OPENROUTER_API_KEY
 class Models(str, Enum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
-    Llama = "meta-llama/llama-3.3-70b-instruct:free"
+    Llama = "meta-llama/llama-3.2-3b-instruct:free"
     Stepfun = "stepfun/step-3.5-flash:free"
+    Qwen = "qwen/qwen3-next-80b-a3b-instruct:free"
+    Gemma = "google/gemma-3-4b-it:free"
+    Zai = "z-ai/glm-4.5-air:free"
+    GPTOSS = "openai/gpt-oss-20b:free"
+    Acree = "arcee-ai/trinity-mini:free"
 
 
 def parse_message(message: str, add_info: Message) -> Event:
@@ -69,7 +74,7 @@ def parse_message(message: str, add_info: Message) -> Event:
             "Content-Type": "application/json",
         },
         json={
-            "model": Models.Stepfun,
+            "model": Models.Acree,
             "messages": [
                 {
                     "role": "user",
