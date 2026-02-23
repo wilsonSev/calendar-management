@@ -1,17 +1,20 @@
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 import json
 import requests
+import os
+from dotenv import load_dotenv
 
 from event import Event
 from message import Message
-from config import OPENROUTER_API_KEY
+# from config import OPENROUTER_API_KEY
 
 
-class Models(str, Enum):
+class Models(StrEnum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
     Llama = "meta-llama/llama-3.3-70b-instruct:free"
+    Stepfun = "stepfun/step-3.5-flash:free"
 
 
 load_dotenv()
