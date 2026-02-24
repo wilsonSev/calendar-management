@@ -33,7 +33,7 @@ func (c *Client) Close() error {
 }
 
 func (c *Client) Analyze(ctx context.Context, tgUserID int64, text string) (*pb.AnalyzeTextResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 
 	req := &pb.AnalyzeTextRequest{
