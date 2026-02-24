@@ -1,0 +1,160 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Router",
+      "type": "shell",
+      "command": "go run cmd/router/main.go",
+      "options": {
+        "cwd": "${workspaceFolder}/router"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "services"
+      }
+    },
+    {
+      "label": "Run Gateway",
+      "type": "shell",
+      "command": "go run cmd/server/main.go",
+      "options": {
+        "cwd": "${workspaceFolder}/services/gateway"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "services"
+      }
+    },
+    {
+      "label": "Run NLP Service",
+      "type": "shell",
+      "command": "source venv/bin/activate && python mock_scheduler_server.py",
+      "options": {
+        "cwd": "${workspaceFolder}/nlp",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "services"
+      }
+    },
+    {
+      "label": "Run Bot",
+      "type": "shell",
+      "command": "go run cmd/bot/main.go",
+      "options": {
+        "cwd": "${workspaceFolder}/services/bot"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "services"
+      }
+    },
+    {
+      "label": "Start All Services",
+      "dependsOn": [
+        "Run Router",
+        "Run Gateway",
+        "Run NLP Service",
+        "Run Bot"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Check Services Status",
+      "type": "shell",
+      "command": "bash check_status.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Test NLP Connection",
+      "type": "shell",
+      "command": "source venv/bin/activate && python check_services.py",
+      "options": {
+        "cwd": "${workspaceFolder}/nlp",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Test NLP Parsing",
+      "type": "shell",
+      "command": "source venv/bin/activate && python main.py",
+      "options": {
+        "cwd": "${workspaceFolder}/nlp",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Test Analyzer Service",
+      "type": "shell",
+      "command": "source venv/bin/activate && python test_analyzer_client.py",
+      "options": {
+        "cwd": "${workspaceFolder}/nlp",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Test Mock Scheduler",
+      "type": "shell",
+      "command": "source venv/bin/activate && python test_mock_scheduler.py",
+      "options": {
+        "cwd": "${workspaceFolder}/nlp",
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}
