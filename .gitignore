@@ -7,3 +7,4 @@ nlp/__pycache__/
 __pycache__/
 *.pyc
 .idea
+dump.json
