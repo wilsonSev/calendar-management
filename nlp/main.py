@@ -50,17 +50,22 @@ if __name__ == "__main__":
     # Parse message using OpenRouter
     add_info = Message(datetime.now(), "Bogdan")
     
+    print("Sending request to OpenRouter API...")
+    print("(This may take 5-10 seconds)\n")
+    
     try:
         parsed_event = openrouter.parse_message(test_message, add_info)
         
-        print("✓ Parsing successful!")
+        print("\n✓ Parsing successful!")
         print(f"\nParsed Event:")
         print(f"  Name: {parsed_event.name}")
         print(f"  Start: {parsed_event.start_time}")
         print(f"  End: {parsed_event.finish_time}")
         
     except Exception as e:
-        print(f"✗ Error: {e}")
+        print(f"\n✗ Error: {e}")
+        import traceback
+        traceback.print_exc()
     
     # Uncomment below to test full flow with gRPC:
     # process_user_message(test_message, user_id="123456", username="Bogdan")

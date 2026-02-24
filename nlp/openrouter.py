@@ -11,22 +11,28 @@ from config import OPENROUTER_API_KEY
 class Models(str, Enum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
-    Llama = "meta-llama/llama-3.2-3b-instruct:free"
+    Llama = "meta-llama/llama-3.3-70b-instruct:free"
     Stepfun = "stepfun/step-3.5-flash:free"
-    Qwen = "qwen/qwen3-next-80b-a3b-instruct:free"
-    Gemma = "google/gemma-3-4b-it:free"
-    Zai = "z-ai/glm-4.5-air:free"
-    GPTOSS = "openai/gpt-oss-20b:free"
-    Acree = "arcee-ai/trinity-mini:free"
 
 
 def parse_message(message: str, add_info: Message) -> Event:
+    """
+    Parse user message using OpenRouter LLM
+    
+    Args:
+        message: Raw text from user
+        add_info: Additional context (timestamp, username)
+    
+    Returns:
+        Event object with parsed data
+    """
     if not OPENROUTER_API_KEY:
         raise RuntimeError("OPENROUTER_API_KEY is not set. Add 'openrouter=your_key' to .env file")
 
     def get_response_with_event(model_response: dict) -> Event:
+        """Extract Event from LLM response"""
         with open("dump.json", "w") as file:
-            json.dump(model_response, file)
+            json.dump(model_response, file, indent=2, ensure_ascii=False)
         
         content = model_response["choices"][0]["message"]["content"]
         
@@ -36,7 +42,6 @@ def parse_message(message: str, add_info: Message) -> Event:
         
         try:
             event_data = json.loads(content)
-            # Handle potentially missing times gracefully or ensure prompt enforces it
             start_str = event_data.get("start-time")
             end_str = event_data.get("end-time")
             
@@ -57,37 +62,49 @@ def parse_message(message: str, add_info: Message) -> Event:
 
 {{
   "event-name": string,
-  "start-time": date,
-  "end-time": date,
+  "start-time": date (ISO format),
+  "end-time": date (ISO format)
 }}
 
 Текст:
 {message}
 
-Верни только JSON без пояснений, не выдумывай информацию, которой нет в этом сообщении. Если что-то явно не написано здесь, то пропускай это поле.
+Верни только JSON без пояснений, не выдумывай информацию, которой нет в этом сообщении.
 """
     
-    response = requests.post(
-        url="https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "model": Models.Acree,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": f"{{user_message: {prompt}, add_info: {add_info}}}",
-                }
-            ],
-        },
-    )
+    print(f"→ Calling OpenRouter API (model: {Models.Llama.value})...")
     
-    if response.status_code != 200:
-        raise Exception(f"OpenRouter API error: {response.text}")
+    try:
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": Models.Stepfun,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+            },
+            timeout=30  # 30 seconds timeout
+        )
+        
+        print(f"← Response status: {response.status_code}")
+        
+        if response.status_code != 200:
+            print(f"Error response: {response.text}")
+            raise Exception(f"OpenRouter API error: {response.status_code} - {response.text}")
 
-    print("Response from OpenRouter:")
-    print(json.dumps(response.json(), indent=2, ensure_ascii=False))
-    
-    return get_response_with_event(response.json())
+        print("→ Parsing response...")
+        return get_response_with_event(response.json())
+        
+    except requests.exceptions.Timeout:
+        raise Exception("OpenRouter API timeout (30s). Try again later.")
+    except requests.exceptions.ConnectionError:
+        raise Exception("Cannot connect to OpenRouter API. Check your internet connection.")
+    except Exception as e:
+        raise Exception(f"OpenRouter API error: {e}")
