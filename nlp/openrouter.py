@@ -1,18 +1,25 @@
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 import json
 import requests
+import os
+from dotenv import load_dotenv
 
 from event import Event
 from message import Message
-from config import OPENROUTER_API_KEY
 
 
-class Models(str, Enum):
+class Models(StrEnum):
     """Available LLM models"""
     KatCoder = "z-ai/glm-4.5-air:free"
     Llama = "meta-llama/llama-3.3-70b-instruct:free"
     Stepfun = "stepfun/step-3.5-flash:free"
+
+
+# Load .env file from the same directory as this script
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY") or os.getenv("openrouter")
 
 
 def parse_message(message: str, add_info: Message) -> Event:
@@ -72,7 +79,7 @@ def parse_message(message: str, add_info: Message) -> Event:
 Верни только JSON без пояснений, не выдумывай информацию, которой нет в этом сообщении.
 """
     
-    print(f"→ Calling OpenRouter API (model: {Models.Llama.value})...")
+    print(f"→ Calling OpenRouter API (model: {Models.Stepfun.value})...")
     
     try:
         response = requests.post(
@@ -90,7 +97,7 @@ def parse_message(message: str, add_info: Message) -> Event:
                     }
                 ],
             },
-            timeout=30  # 30 seconds timeout
+            timeout=50  # 50 seconds timeout
         )
         
         print(f"← Response status: {response.status_code}")

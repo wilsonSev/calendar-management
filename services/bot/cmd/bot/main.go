@@ -7,20 +7,25 @@ import (
 	"strings"
 	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-
-
+	"bot/internal/analyzer"
 	"bot/internal/config"
 	"bot/internal/gateway"
-	"bot/internal/analyzer"
+	"sync"
+
+	router_pb "calendar-management/proto/router"
 
 	pb "github.com/andrepribavkin/calendar-management/proto/analyzer/v1"
-	router_pb "calendar-management/proto/router"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// Simple in-memory storage for user states
+var (
+	userStates = make(map[int64]*pb.CreateEvent)
+	stateMu    sync.Mutex
+)
 
 func main() {
 	cfg := config.Load()
@@ -57,6 +62,11 @@ func main() {
 	updates := bot.GetUpdatesChan(u)
 
 	for upd := range updates {
+		if upd.CallbackQuery != nil {
+			handleCallback(bot, routerClient, upd.CallbackQuery)
+			continue
+		}
+
 		if upd.Message == nil {
 			continue
 		}
@@ -120,7 +130,7 @@ func main() {
 			} else {
 				send(bot, chatID, "❌ Google не подключен. Нажми /connect")
 			}
-		
+
 		case "test_add":
 			start := time.Now().Add(24 * time.Hour)
 			end := start.Add(1 * time.Hour)
@@ -140,9 +150,9 @@ func main() {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			resp, err := routerClient.CreateEvent(ctx, req)
 			cancel()
-			
+
 			if err != nil {
-				send(bot, chatID, "❌ Ошибка router: " + err.Error())
+				send(bot, chatID, "❌ Ошибка router: "+err.Error())
 				log.Printf("CreateEvent error: %v", err)
 			} else {
 				send(bot, chatID, fmt.Sprintf("✅ Событие создано! ID: %s, Success: %v", resp.Id, resp.Success))
@@ -154,10 +164,9 @@ func main() {
 	}
 }
 
-
 func handleText(bot *tgbotapi.BotAPI, anlz *analyzer.Client, msg *tgbotapi.Message) {
 	send(bot, msg.Chat.ID, "⏳ Анализирую...")
-	
+
 	resp, err := anlz.Analyze(context.Background(), int64(msg.From.ID), msg.Text)
 	if err != nil {
 		log.Printf("analyze error: %v", err)
@@ -170,19 +179,90 @@ func handleText(bot *tgbotapi.BotAPI, anlz *analyzer.Client, msg *tgbotapi.Messa
 		evt := r.CreateEvent
 		start := evt.StartTime.AsTime()
 		end := evt.EndTime.AsTime()
-		send(bot, msg.Chat.ID, fmt.Sprintf("📅 Создать событие?\n\nНазвание: %s\nОписание: %s\nВремя: %s - %s",
+
+		// Save state for user
+		stateMu.Lock()
+		userStates[msg.From.ID] = evt
+		stateMu.Unlock()
+
+		txt := fmt.Sprintf("📅 Создать событие?\n\nНазвание: %s\nОписание: %s\nВремя: %s - %s",
 			evt.Title, evt.Description,
 			start.Format(time.RFC822),
-			end.Format(time.RFC822)))
-	
+			end.Format(time.RFC822))
+
+		msgResp := tgbotapi.NewMessage(msg.Chat.ID, txt)
+		msgResp.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+			tgbotapi.NewInlineKeyboardRow(
+				tgbotapi.NewInlineKeyboardButtonData("✅ Да", "confirm_event"),
+				tgbotapi.NewInlineKeyboardButtonData("❌ Нет", "cancel_event"),
+			),
+		)
+		_, _ = bot.Send(msgResp)
+
 	case *pb.AnalyzeTextResponse_NeedClarification:
 		send(bot, msg.Chat.ID, "❓ "+r.NeedClarification.Question)
-	
+
 	case *pb.AnalyzeTextResponse_Error:
 		send(bot, msg.Chat.ID, "❌ "+r.Error.Message)
-	
+
 	default:
 		send(bot, msg.Chat.ID, "Непонятный ответ от сервера")
+	}
+}
+
+func handleCallback(bot *tgbotapi.BotAPI, routerClient router_pb.SchedulerClient, cb *tgbotapi.CallbackQuery) {
+	defer func() {
+		// Answer callback to stop loading animation
+		bot.Request(tgbotapi.NewCallback(cb.ID, ""))
+	}()
+
+	userID := cb.From.ID
+
+	if cb.Data == "cancel_event" {
+		stateMu.Lock()
+		delete(userStates, userID)
+		stateMu.Unlock()
+
+		edit := tgbotapi.NewEditMessageText(cb.Message.Chat.ID, cb.Message.MessageID, "❌ Отменено.")
+		bot.Send(edit)
+		return
+	}
+
+	if cb.Data == "confirm_event" {
+		stateMu.Lock()
+		evt, ok := userStates[userID]
+		delete(userStates, userID) // Clear state immediately
+		stateMu.Unlock()
+
+		if !ok {
+			send(bot, cb.Message.Chat.ID, "Срок действия истёк или событие уже обработано.")
+			return
+		}
+
+		req := &router_pb.CreateEventRequest{
+			Title:       evt.Title,
+			Description: evt.Description,
+			UserId:      fmt.Sprintf("%d", userID),
+			Time: &router_pb.CreateEventRequest_Datetime{
+				Datetime: &router_pb.DateTimeRange{
+					StartDatetime: evt.StartTime, // Already timestamppb
+					EndDatetime:   evt.EndTime,
+				},
+			},
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		resp, err := routerClient.CreateEvent(ctx, req)
+		cancel()
+
+		if err != nil {
+			log.Printf("CreateEvent error: %v", err)
+			send(bot, cb.Message.Chat.ID, "❌ Ошибка при создании: "+err.Error())
+		} else {
+			text := fmt.Sprintf("✅ Событие создано! (ID: %s)", resp.Id)
+			edit := tgbotapi.NewEditMessageText(cb.Message.Chat.ID, cb.Message.MessageID, text)
+			bot.Send(edit)
+		}
 	}
 }
 
