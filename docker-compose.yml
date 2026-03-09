@@ -7,9 +7,110 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-calendar_db}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-calendar_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  gateway-migrate:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calendar_db}?sslmode=disable}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["/app/migrate", "-dir", "supabase/migrations"]
+    restart: "no"
+
+  router:
+    build:
+      context: .
+      dockerfile: router/Dockerfile
+    environment:
+      CONFIG_PATH: /app/config/docker.yaml
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calendar_db}?sslmode=disable}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gateway-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 50051"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    environment:
+      PORT: 8080
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calendar_db}?sslmode=disable}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      GOOGLE_SCOPES: ${GOOGLE_SCOPES:-https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/tasks}
+      BOT_SECRET: ${BOT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gateway-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8080"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+    ports:
+      - "${PORT:-8081}:8080"
+    restart: unless-stopped
+
+  nlp:
+    build:
+      context: .
+      dockerfile: nlp/Dockerfile
+    environment:
+      NLP_PORT: 50052
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s = socket.create_connection(('127.0.0.1', 50052), 2); s.close()"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: .
+      dockerfile: services/bot/Dockerfile
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      GATEWAY_BASE_URL: ${GATEWAY_BASE_URL:-http://gateway:8080}
+      BOT_SECRET: ${BOT_SECRET}
+      ANALYZER_TARGET: ${ANALYZER_TARGET:-nlp:50052}
+      ROUTER_TARGET: ${ROUTER_TARGET:-router:50051}
+    depends_on:
+      gateway:
+        condition: service_healthy
+      nlp:
+        condition: service_healthy
+      router:
+        condition: service_healthy
+    command: ["/bin/sh", "-c", "until nc -z gateway 8080 && nc -z router 50051 && nc -z nlp 50052; do sleep 2; done; /app/bot"]
     restart: unless-stopped
 
 volumes:
