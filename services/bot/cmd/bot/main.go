@@ -43,7 +43,6 @@ func main() {
 		}
 	}
 
-	// Connect to router
 	routerConn, err := grpc.NewClient(cfg.RouterTarget, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("warning: router connect failed: %v", err)
@@ -85,12 +84,10 @@ func main() {
 		cmd := upd.Message.Command()
 		switch cmd {
 		case "start":
-			send(bot, chatID,
-				"Привет! Я помогу подключить Google Calendar.\n\nКоманды:\n/connect — подключить Google\n/status — статус подключения\n/test_add — тест создания события\n/help — помощь")
+			send(bot, chatID, MsgWelcome)
 
 		case "help":
-			send(bot, chatID,
-				"/connect — получить ссылку на подключение Google\n/status — проверить, подключен ли Google\n/test_add — создать тестовое событие (завтра в 10:00)\n\nПосле подключения можно будет добавлять события текстом.")
+			send(bot, chatID, MsgHelp)
 
 		case "connect":
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -98,7 +95,8 @@ func main() {
 
 			link, err := gw.AuthStart(ctx, tgUserID)
 			if err != nil {
-				send(bot, chatID, "Не смог получить ссылку на подключение. Проверь, что gateway запущен.")
+				log.Printf("auth start error for user %d: %v", tgUserID, err)
+				send(bot, chatID, MsgErrAuthStart)
 				log.Printf("auth start error: %v", err)
 				continue
 			}
@@ -121,15 +119,18 @@ func main() {
 
 			ok, err := gw.Status(ctx, tgUserID)
 			if err != nil {
-				send(bot, chatID, "Не смог проверить статус. Проверь gateway.")
-				log.Printf("status error: %v", err)
+				log.Printf("status check error for user %d: %v", tgUserID, err)
+				send(bot, chatID, MsgErrStatusCheck)
 				continue
 			}
 			if ok {
-				send(bot, chatID, "✅ Google подключен.")
+				send(bot, chatID, MsgConnectSuccess)
 			} else {
-				send(bot, chatID, "❌ Google не подключен. Нажми /connect")
+				send(bot, chatID, MsgConnectFail)
 			}
+
+		case "info":
+			send(bot, chatID, MsgInfo)
 
 		case "test_add":
 			start := time.Now().Add(24 * time.Hour)
@@ -148,18 +149,18 @@ func main() {
 			}
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			resp, err := routerClient.CreateEvent(ctx, req)
+			_, err := routerClient.CreateEvent(ctx, req)
 			cancel()
 
 			if err != nil {
-				send(bot, chatID, "❌ Ошибка router: "+err.Error())
-				log.Printf("CreateEvent error: %v", err)
+				log.Printf("CreateEvent test failed for user %d: %v", tgUserID, err)
+				send(bot, chatID, MsgErrRouter)
 			} else {
-				send(bot, chatID, fmt.Sprintf("✅ Событие создано! ID: %s, Success: %v", resp.Id, resp.Success))
+				send(bot, chatID, MsgEventCreated)
 			}
 
 		default:
-			send(bot, chatID, "Не знаю эту команду. /help")
+			send(bot, chatID, MsgErrUnknownCmd)
 		}
 	}
 }
@@ -169,8 +170,8 @@ func handleText(bot *tgbotapi.BotAPI, anlz *analyzer.Client, msg *tgbotapi.Messa
 
 	resp, err := anlz.Analyze(context.Background(), int64(msg.From.ID), msg.Text)
 	if err != nil {
-		log.Printf("analyze error: %v", err)
-		send(bot, msg.Chat.ID, "Ошибка анализа: "+err.Error())
+		log.Printf("analyze error for user %d: %v", msg.From.ID, err)
+		send(bot, msg.Chat.ID, MsgErrAnalyze)
 		return
 	}
 
@@ -180,7 +181,6 @@ func handleText(bot *tgbotapi.BotAPI, anlz *analyzer.Client, msg *tgbotapi.Messa
 		start := evt.StartTime.AsTime()
 		end := evt.EndTime.AsTime()
 
-		// Save state for user
 		stateMu.Lock()
 		userStates[msg.From.ID] = evt
 		stateMu.Unlock()
@@ -206,7 +206,8 @@ func handleText(bot *tgbotapi.BotAPI, anlz *analyzer.Client, msg *tgbotapi.Messa
 		send(bot, msg.Chat.ID, "❌ "+r.Error.Message)
 
 	default:
-		send(bot, msg.Chat.ID, "Непонятный ответ от сервера")
+		log.Printf("unknown analyzer response type: %T", resp.Result)
+		send(bot, msg.Chat.ID, MsgErrGeneric)
 	}
 }
 
@@ -223,7 +224,7 @@ func handleCallback(bot *tgbotapi.BotAPI, routerClient router_pb.SchedulerClient
 		delete(userStates, userID)
 		stateMu.Unlock()
 
-		edit := tgbotapi.NewEditMessageText(cb.Message.Chat.ID, cb.Message.MessageID, "❌ Отменено.")
+		edit := tgbotapi.NewEditMessageText(cb.Message.Chat.ID, cb.Message.MessageID, MsgActionCancelled)
 		bot.Send(edit)
 		return
 	}
@@ -235,7 +236,7 @@ func handleCallback(bot *tgbotapi.BotAPI, routerClient router_pb.SchedulerClient
 		stateMu.Unlock()
 
 		if !ok {
-			send(bot, cb.Message.Chat.ID, "Срок действия истёк или событие уже обработано.")
+			send(bot, cb.Message.Chat.ID, MsgErrExpired)
 			return
 		}
 
@@ -252,14 +253,14 @@ func handleCallback(bot *tgbotapi.BotAPI, routerClient router_pb.SchedulerClient
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		resp, err := routerClient.CreateEvent(ctx, req)
+		_, err := routerClient.CreateEvent(ctx, req)
 		cancel()
 
 		if err != nil {
-			log.Printf("CreateEvent error: %v", err)
-			send(bot, cb.Message.Chat.ID, "❌ Ошибка при создании: "+err.Error())
+			log.Printf("CreateEvent error in callback: %v", err)
+			send(bot, cb.Message.Chat.ID, MsgErrRouter)
 		} else {
-			text := fmt.Sprintf("✅ Событие создано! (ID: %s)", resp.Id)
+			text := MsgEventCreated
 			edit := tgbotapi.NewEditMessageText(cb.Message.Chat.ID, cb.Message.MessageID, text)
 			bot.Send(edit)
 		}
