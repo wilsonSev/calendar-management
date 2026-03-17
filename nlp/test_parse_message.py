@@ -2,11 +2,11 @@
 from datetime import datetime
 from message import Message
 import openrouter
+import deepseek_api
+import corebras
+import yandex_api
 
-print("=== OpenRouter API Test ===\n")
-
-# Simple test message
-test_message = "Встреча завтра в 14:00"
+test_message = "Встреча по попводу академической разности завтра в 14:00 длиной в полтора часа"
 print(f"Test message: {test_message}\n")
 
 add_info = Message(datetime.now(), "Test User")
@@ -14,8 +14,8 @@ add_info = Message(datetime.now(), "Test User")
 try:
     print("Sending request to OpenRouter...")
     print("(This should take 5-15 seconds)\n")
-    
-    result = openrouter.parse_message(test_message, add_info)
+
+    result = yandex_api.parse_message(test_message, add_info)
     
     print("\n✓ SUCCESS!")
     print(f"\nParsed event:")
@@ -26,7 +26,3 @@ try:
     
 except Exception as e:
     print(f"\n✗ ERROR: {e}")
-    print("\nTroubleshooting:")
-    print("1. Check your OpenRouter API key in .env")
-    print("2. Check your internet connection")
-    print("3. Try again in a few seconds")

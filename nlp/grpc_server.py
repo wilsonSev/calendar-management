@@ -23,7 +23,7 @@ except ImportError:
     import analyzer_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
 
-import openrouter
+import yandex_api
 from message import Message
 
 class AnalyzerService(analyzer_pb2_grpc.AnalyzerServiceServicer):
@@ -38,7 +38,7 @@ class AnalyzerService(analyzer_pb2_grpc.AnalyzerServiceServicer):
         )
         
         try:
-            event = openrouter.parse_message(request.text, msg_info)
+            event = yandex_api.parse_message(request.text, msg_info)
             
             # Convert python Event to proto CreateEvent
             start_ts = Timestamp()

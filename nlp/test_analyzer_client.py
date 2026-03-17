@@ -16,7 +16,7 @@ def test_analyze_text(text: str, user_id: int = 123456):
     print(f"{'='*60}\n")
     
     # Connect to Analyzer service
-    channel = grpc.insecure_channel('localhost:50053')
+    channel = grpc.insecure_channel('localhost:50051')
     stub = analyzer_pb2_grpc.AnalyzerServiceStub(channel)
     
     # Create request

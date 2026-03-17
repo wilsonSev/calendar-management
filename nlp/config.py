@@ -9,7 +9,17 @@ load_dotenv(dotenv_path=env_path)
 
 # gRPC service endpoints
 SCHEDULER_HOST = getenv("SCHEDULER_HOST", "localhost")
-SCHEDULER_PORT = getenv("SCHEDULER_PORT", "50052")  # TODO: update with actual port
+SCHEDULER_PORT = getenv("SCHEDULER_PORT", "50052")
 
-# OpenRouter API
+# OpenRouter API (legacy)
 OPENROUTER_API_KEY = getenv("openrouter")
+
+# DeepSeek API
+DEEPSEEK_API_KEY = getenv("DEEPSEEK_API_KEY")
+
+# Cerebras API
+CEREBRAS_API_KEY = getenv("CEREBRAS_API_KEY")
+
+# Yandex API
+YANDEX_API_KEY = getenv("YANDEX_API_KEY")
+YANDEX_FOLDER_ID = getenv("YANDEX_FOLDER_ID")
