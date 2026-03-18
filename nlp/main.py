@@ -65,3 +65,4 @@ if __name__ == "__main__":
 
     # Uncomment below to test full flow with gRPC:
     # process_user_message(test_message, user_id="123456", username="Bogdan")
+
