@@ -1,0 +1,12 @@
+env: "prod"
+database_url: ""
+storage_timeout: "5s"
+token_ttl: "1h"
+
+grpc:
+  port: 50051
+  timeout: "5s"
+
+google:
+  client_id: ""
+  client_secret: ""

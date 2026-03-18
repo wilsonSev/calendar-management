@@ -9,17 +9,25 @@ import (
 )
 
 type Config struct {
-	TelegramToken string
+	TelegramToken  string
 	GatewayBaseURL string
-	BotSecret string
+	BotSecret      string
 	AnalyzerTarget string
-	RouterTarget string
+	RouterTarget   string
 }
 
 func mustEnv(name string) string {
 	v := strings.TrimSpace(os.Getenv(name))
 	if v == "" {
 		log.Fatalf("env %s must be set", name)
+	}
+	return v
+}
+
+func envDefault(name, def string) string {
+	v := strings.TrimSpace(os.Getenv(name))
+	if v == "" {
+		return def
 	}
 	return v
 }
@@ -38,6 +46,6 @@ func Load() Config {
 		GatewayBaseURL: mustEnv("GATEWAY_BASE_URL"),
 		BotSecret:      mustEnv("BOT_SECRET"),
 		AnalyzerTarget: os.Getenv("ANALYZER_TARGET"),
-		RouterTarget:   "localhost:50051",
+		RouterTarget:   envDefault("ROUTER_TARGET", "localhost:50051"),
 	}
 }

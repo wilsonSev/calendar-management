@@ -11,7 +11,7 @@ import (
 
 type Config struct {
 	Env            string        `yaml:"env" env-default:"local"`
-	DatabaseURL    string        `yaml:"database_url" env-required:"true"`
+	DatabaseURL    string        `yaml:"database_url" env:"DATABASE_URL" env-required:"true"`
 	StorageTimeout time.Duration `yaml:"storage_timeout" env-default:"5s"`
 	TokenTTL       time.Duration `yaml:"token_ttl" env-default:"1h"`
 	GRPC           GRPCConfig    `yaml:"grpc" env-required:"true"`

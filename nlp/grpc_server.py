@@ -1,27 +1,11 @@
-import asyncio
 import logging
-import sys
 import os
 from concurrent import futures
 import grpc
 from datetime import datetime
-
-# from proto.analyzer.v1 import analyzer_pb2
-# from proto.analyzer.v1 import analyzer_pb2_grpc
-import sys
-import os
-
-# Добавляем путь к сгенерированному коду
-sys.path.append(os.path.join(os.path.dirname(__file__), 'gen'))
-
-try:
-    from proto.analyzer.v1 import analyzer_pb2
-    from proto.analyzer.v1 import analyzer_pb2_grpc
-except ImportError:
-    # Fallback for direct execution
-    import analyzer_pb2
-    import analyzer_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
+
+from lib.analyzer.v1 import analyzer_pb2, analyzer_pb2_grpc
 
 import yandex_api
 from message import Message
