@@ -13,3 +13,13 @@ SCHEDULER_PORT = getenv("SCHEDULER_PORT", "50052")  # TODO: update with actual p
 
 # OpenRouter API
 OPENROUTER_API_KEY = getenv("openrouter")
+
+# DeepSeek API
+DEEPSEEK_API_KEY = getenv("DEEPSEEK_API_KEY")
+
+# Cerebras API
+CEREBRAS_API_KEY = getenv("CEREBRAS_API_KEY")
+
+# Yandex API
+YANDEX_API_KEY = getenv("YANDEX_API_KEY")
+YANDEX_FOLDER_ID = getenv("YANDEX_FOLDER_ID")
